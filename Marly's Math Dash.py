@@ -1,6 +1,7 @@
 import tkinter as tk
 import time
 from sys import maxsize
+import random
 from tkinter import PhotoImage, Button
 def playButtonClick():
     
@@ -22,23 +23,24 @@ def playButtonClick():
     labelAboveEntry.grid(row=54, column=45, rowspan=2, columnspan=11)
     timeLabel.grid(row=49, column=57, columnspan=8,sticky='sew')
 
-def menuScreenGrid():
-    screen1.grid_rowconfigure(0, weight=440, minsize=440)
-    screen1.grid_rowconfigure(1, weight=200, minsize=200)
-    screen1.grid_rowconfigure(2, weight=440, minsize=440)
 
-    screen1.grid_columnconfigure(0, weight=1, minsize=640)
-    screen1.grid_columnconfigure(1, weight=1, minsize=640)
-    screen1.grid_columnconfigure(2, weight=1, minsize=640.2)
-    
-    playButton.grid(row=1, column=1,sticky='ew', pady=0)
-    leaderboardButton.grid(row=2, column=1, sticky='wen',pady=0)
-    exitButton.grid(row=2, column=1,sticky='we',)
+def menuScreenGrid():
+    screen1.grid_rowconfigure(0, weight=1)
+    screen1.grid_rowconfigure(1, weight=1)
+    screen1.grid_rowconfigure(2, weight=1)
+
+    screen1.grid_columnconfigure(0, weight=1)
+    screen1.grid_columnconfigure(1, weight=1)
+    screen1.grid_columnconfigure(2, weight=1)
+
+    playButton.grid(row=1, column=1, sticky='ew', padx=20, pady=20)
+    leaderboardButton.grid(row=2, column=1, sticky='ew', padx=20, pady=20)
+    exitButton.grid(row=3, column=1, sticky='new', padx=20, pady=10)
 
 def playScreenGrid():
     for i in range(101):
-        screen1.grid_rowconfigure(i, weight=1, minsize=10.969)
-        screen1.grid_columnconfigure(index=i, weight=1, minsize=19)
+        screen1.grid_rowconfigure(index=i, weight=1,)
+        screen1.grid_columnconfigure(index=i, weight=1,)
         
 
 def reset_grid(layout):
@@ -67,7 +69,7 @@ screen1.geometry(f"{screen1.winfo_screenwidth()}x{screen1.winfo_screenheight()}"
 screen1.title("Marly's Math Dash")
 windowIcon = PhotoImage(file = 'sprites/chillFish.png')
 screen1.iconphoto(True, windowIcon)
-screen1.attributes('-fullscreen', True)
+screen1.attributes('-fullscreen', True )
 
 
 #screen buttons
