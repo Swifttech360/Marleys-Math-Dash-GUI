@@ -1,31 +1,74 @@
 import tkinter as tk
+import time
 from sys import maxsize
 from tkinter import PhotoImage, Button
 def playButtonClick():
-    for i in range(5):
-        print("You Pressed The Button")
+    
+    for widget in menuWidgetList:
+        widget.grid_forget()
+    
+    playScreenGrid()
+    gameEntry.grid(
+        row=57,
+        rowspan=6,
+        column=46, 
+        sticky='news', 
+        columnspan=9
+    )
+    gameEntry.insert(0, "Enter Answers Here")
+    gameEntry.bind('<Button-1>', gameEntryFocusIn)
+    
+    questionBox.grid(row=49, column=45, rowspan=2, columnspan=11, sticky='nsew')
+    labelAboveEntry.grid(row=54, column=45, rowspan=2, columnspan=11)
+    timeLabel.grid(row=49, column=57, columnspan=8,sticky='sew')
 
+def menuScreenGrid():
+    screen1.grid_rowconfigure(0, weight=440, minsize=440)
+    screen1.grid_rowconfigure(1, weight=200, minsize=200)
+    screen1.grid_rowconfigure(2, weight=440, minsize=440)
 
+    screen1.grid_columnconfigure(0, weight=1, minsize=640)
+    screen1.grid_columnconfigure(1, weight=1, minsize=640)
+    screen1.grid_columnconfigure(2, weight=1, minsize=640.2)
+    
+    playButton.grid(row=1, column=1,sticky='ew', pady=0)
+    leaderboardButton.grid(row=2, column=1, sticky='wen',pady=0)
+    exitButton.grid(row=2, column=1,sticky='we',)
 
+def playScreenGrid():
+    for i in range(101):
+        screen1.grid_rowconfigure(i, weight=1, minsize=10.969)
+        screen1.grid_columnconfigure(index=i, weight=1, minsize=19)
+        
+
+def reset_grid(layout):
+    for i in range(51):
+        layout.grid_rowconfigure(i, weight=0)
+    for i in range(51):
+        layout.grid_columnconfigure(i, weight=0)
+    menuScreenGrid()
+
+def gameEntryFocusIn(event):
+    global outputLabel
+    global gameEntry
+    global clicked
+    if not clicked:
+        gameEntry.delete(0, 'end')
+        clicked = True
+
+clicked = False
+currentTime = 60
 #screen1 creation
-
+print(f"1: {5.4845 * 2}\n2: {19}")
 
 screen1 = tk.Tk()
 screen1.config(background='#1f1f1f')
-screen1.geometry(f"{1920}x{1080}")
+screen1.geometry(f"{screen1.winfo_screenwidth()}x{screen1.winfo_screenheight()}")
 screen1.title("Marly's Math Dash")
 windowIcon = PhotoImage(file = 'sprites/chillFish.png')
 screen1.iconphoto(True, windowIcon)
+screen1.attributes('-fullscreen', True)
 
-
-
-screen1.grid_rowconfigure(0, weight=440, minsize=440)
-screen1.grid_rowconfigure(1, weight=200, minsize=200)
-screen1.grid_rowconfigure(2, weight=440, minsize=440)
-
-screen1.grid_columnconfigure(0, weight=1, minsize=640)
-screen1.grid_columnconfigure(1, weight=1, minsize=640)
-screen1.grid_columnconfigure(2, weight=1, minsize=640)
 
 #screen buttons
 playSprite = PhotoImage(file='sprites/PerfectlyCroppedPlayButton.png')
@@ -46,7 +89,6 @@ playButton.config(
     width=7
     )
 
-playButton.grid(row=0, column=1,sticky='ews', pady=0 )
 
 leaderboardButton = tk.Button(screen1)
 
@@ -61,7 +103,7 @@ leaderboardButton.config(
     width=10
 )
 
-leaderboardButton.grid(row=1, column=1, sticky='we',)
+
 
 
 exitButton = tk.Button(screen1)
@@ -76,20 +118,40 @@ exitButton.config(
     activebackground='#940000',
     width=7
 )
-exitButton.grid(row=2, column=1,sticky='wen', pady=0)
+menuScreenGrid()
+
+menuWidgetList=[playButton, leaderboardButton, exitButton]
+#Game running screen_____________________________________________________
+gameEntry=tk.Entry(
+    font=('arial', 30, 'bold'),
+    bg='#f5f5f5',
+    fg='black',
+    justify='center'
+)
+questionBox = tk.Label(
+    text='87 + 32',
+    font=('arial', 85, 'bold'),
+    bg=f"{screen1.cget('bg')}",
+    fg='#c40000',
+    justify='center'
+)
+labelAboveEntry = tk.Label(
+    text='Correct!',
+    font=('arial', 85, 'bold'),
+    bg=f"{screen1.cget('bg')}",
+    fg='green',
+    justify='center'
+)
+timeLabel = tk.Label(
+    text=f'Time: {currentTime}',
+    font=('arial', 20, 'bold'),
+    bg='grey',
+    fg= 'blue'
+)
 
 
 
-#playButton.config(
- #   command = playButtonClick,
-  #  image=playSprite,
-   # borderwidth=0,
-    #relief='flat',
-    #bg='#a80000',
-    #activebackground='#a80000'
-    #)
-# NOTE: PlaySprite's dimensions are 1916x814
-#playButton.place(x=(2560-450) // 2,y= 500)
+
 
 
 
