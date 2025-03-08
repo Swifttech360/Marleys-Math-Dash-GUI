@@ -53,6 +53,7 @@ def menuScreen():
     playButton.grid(row=1, column=1, sticky='ews', padx=20, pady=0)
     leaderboardButton.grid(row=2, column=1, sticky='sew', padx=20, pady=20)
     exitButton.grid(row=3, column=1, sticky='new', padx=20, pady=10)
+    spacer.grid(row=4, column=1, sticky='news')
 
 def playScreenGrid():
     for i in range(101):
@@ -140,6 +141,10 @@ exitButton.config(
     activebackground='#940000',
     width=7
 )
+spacer = tk.Label(
+    bg=f'{screen1.cget('bg')}',
+    height=20
+)
 menuScreen()
 
 menuWidgetList=[playButton, leaderboardButton, exitButton]
@@ -176,6 +181,7 @@ scoreLabel = tk.Label(
     bg=f'black',
     fg= 'blue'
 )
+
 
 print('hi')
 
