@@ -1,8 +1,24 @@
 import tkinter as tk
+#from tkinter import PhotoImage, Button
 import time
 from sys import maxsize
-import random
-from tkinter import PhotoImage, Button
+import random as ran
+
+def getEquation():
+    global currentEquation
+    global  enteredAnswer
+    operatorList = ['+', '-', '*', '÷' ]
+    randnum1 = ran.randint(0, 130)
+    randnum2 = ran.randint(0, 130)
+    randomOperator1 = ran.choice(operatorList)
+    equationDisplay = f'{randnum1} {randomOperator1}, {randnum2}'
+    answer = eval(equationDisplay)
+
+
+
+
+
+
 def playButtonClick():
     
     for widget in menuWidgetList:
@@ -22,19 +38,20 @@ def playButtonClick():
     questionBox.grid(row=49, column=45, rowspan=2, columnspan=11, sticky='nsew')
     labelAboveEntry.grid(row=54, column=45, rowspan=2, columnspan=11)
     timeLabel.grid(row=49, column=57, columnspan=8,sticky='sew')
+    scoreLabel.grid(row=50, column=57, columnspan=8, sticky='sew')
 
 
-def menuScreenGrid():
-    screen1.grid_rowconfigure(0, weight=1)
+def menuScreen():
+    screen1.grid_rowconfigure(0, weight=200)
     screen1.grid_rowconfigure(1, weight=1)
     screen1.grid_rowconfigure(2, weight=1)
 
-    screen1.grid_columnconfigure(0, weight=1)
+    screen1.grid_columnconfigure(0, weight=10)
     screen1.grid_columnconfigure(1, weight=1)
-    screen1.grid_columnconfigure(2, weight=1)
+    screen1.grid_columnconfigure(2, weight=10)
 
-    playButton.grid(row=1, column=1, sticky='ew', padx=20, pady=20)
-    leaderboardButton.grid(row=2, column=1, sticky='ew', padx=20, pady=20)
+    playButton.grid(row=1, column=1, sticky='ews', padx=20, pady=0)
+    leaderboardButton.grid(row=2, column=1, sticky='sew', padx=20, pady=20)
     exitButton.grid(row=3, column=1, sticky='new', padx=20, pady=10)
 
 def playScreenGrid():
@@ -48,7 +65,7 @@ def reset_grid(layout):
         layout.grid_rowconfigure(i, weight=0)
     for i in range(51):
         layout.grid_columnconfigure(i, weight=0)
-    menuScreenGrid()
+    menuScreen()
 
 def gameEntryFocusIn(event):
     global outputLabel
@@ -60,6 +77,9 @@ def gameEntryFocusIn(event):
 
 clicked = False
 currentTime = 60
+currentEquation = None
+enteredAnswer = None
+currentScore = 0
 #screen1 creation
 print(f"1: {5.4845 * 2}\n2: {19}")
 
@@ -67,15 +87,15 @@ screen1 = tk.Tk()
 screen1.config(background='#1f1f1f')
 screen1.geometry(f"{screen1.winfo_screenwidth()}x{screen1.winfo_screenheight()}")
 screen1.title("Marly's Math Dash")
-windowIcon = PhotoImage(file = 'sprites/chillFish.png')
+windowIcon = tk.PhotoImage(file = 'sprites/chillFish.png')
 screen1.iconphoto(True, windowIcon)
 screen1.attributes('-fullscreen', True )
 
 
 #screen buttons
-playSprite = PhotoImage(file='sprites/PerfectlyCroppedPlayButton.png')
+playSprite = tk.PhotoImage(file='sprites/PerfectlyCroppedPlayButton.png')
 playSprite = playSprite.subsample(4, 4)
-playButton = Button(screen1)
+playButton = tk.Button(screen1)
 #playButton.pack()
 
 
@@ -120,7 +140,7 @@ exitButton.config(
     activebackground='#940000',
     width=7
 )
-menuScreenGrid()
+menuScreen()
 
 menuWidgetList=[playButton, leaderboardButton, exitButton]
 #Game running screen_____________________________________________________
@@ -147,13 +167,17 @@ labelAboveEntry = tk.Label(
 timeLabel = tk.Label(
     text=f'Time: {currentTime}',
     font=('arial', 20, 'bold'),
-    bg='grey',
+    bg=f'black',
+    fg= 'blue'
+)
+scoreLabel = tk.Label(
+    text=f'Score: {currentScore}',
+    font=('arial', 20, 'bold'),
+    bg=f'black',
     fg= 'blue'
 )
 
-
-
-
+print('hi')
 
 
 
