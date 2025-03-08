@@ -143,7 +143,7 @@ exitButton.config(
 )
 spacer = tk.Label(
     bg=f'{screen1.cget('bg')}',
-    height=20
+    height=10
 )
 menuScreen()
 
