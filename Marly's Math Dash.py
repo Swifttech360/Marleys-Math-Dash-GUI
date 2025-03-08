@@ -47,12 +47,12 @@ def menuScreen():
     screen1.grid_rowconfigure(2, weight=1)
 
     screen1.grid_columnconfigure(0, weight=10)
-    screen1.grid_columnconfigure(1, weight=1)
-    screen1.grid_columnconfigure(2, weight=10)
+    screen1.grid_columnconfigure(1, weight=10)
+    screen1.grid_columnconfigure(2, weight=1)
 
-    playButton.grid(row=1, column=1, sticky='ews', padx=20, pady=0)
-    leaderboardButton.grid(row=2, column=1, sticky='sew', padx=20, pady=20)
-    exitButton.grid(row=3, column=1, sticky='new', padx=20, pady=10)
+    playButton.grid(row=1, column=2, sticky='ews', padx=20, pady=0)
+    leaderboardButton.grid(row=2, column=2, sticky='sew', padx=20, pady=20)
+    exitButton.grid(row=3, column=2, sticky='new', padx=20, pady=10)
     spacer.grid(row=4, column=1, sticky='news')
 
 def playScreenGrid():
