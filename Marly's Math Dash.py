@@ -48,12 +48,13 @@ def menuScreen():
 
     screen1.grid_columnconfigure(0, weight=10)
     screen1.grid_columnconfigure(1, weight=10)
-    screen1.grid_columnconfigure(2, weight=1)
+    #screen1.grid_columnconfigure(2, weight=5)
 
-    playButton.grid(row=1, column=2, sticky='ews', padx=20, pady=0)
-    leaderboardButton.grid(row=2, column=2, sticky='sew', padx=20, pady=20)
-    exitButton.grid(row=3, column=2, sticky='new', padx=20, pady=10)
-    spacer.grid(row=4, column=1, sticky='news')
+    playButton.grid(row=1, column=1, sticky='wsn', padx=20, pady=0)
+    leaderboardButton.grid(row=2, column=1, sticky='nsw', padx=20, pady=20)
+    exitButton.grid(row=3, column=1, sticky='nws', padx=20, pady=0)
+    spacer.grid(row=4, column=1, sticky='nws')
+    titleLabel.grid(row=1, rowspan=3, column=0, pady=0, sticky='nes')
 
 def playScreenGrid():
     for i in range(101):
@@ -109,7 +110,8 @@ playButton.config(
     relief='flat',
     bg='#c40000',
     activebackground='#940000',
-    width=7
+    width=7,
+    height = 1
     )
 
 
@@ -127,8 +129,6 @@ leaderboardButton.config(
 )
 
 
-
-
 exitButton = tk.Button(screen1)
 
 exitButton.config(
@@ -139,16 +139,25 @@ exitButton.config(
     relief='flat',
     bg='#c40000',
     activebackground='#940000',
-    width=7
+    width=14,
+    height = 1,
 )
 spacer = tk.Label(
     bg=f'{screen1.cget('bg')}',
-    height=10
+    height=20
+)
+titleLabel = tk.Label(
+    text = 'Welcome to\n Marly\'s math dash!',
+    bg = 'orange',
+    fg='black',
+    font=('arial', 45, 'bold' )
+    
 )
 menuScreen()
 
-menuWidgetList=[playButton, leaderboardButton, exitButton]
+menuWidgetList=[playButton, leaderboardButton, exitButton, spacer, titleLabel ]
 #Game running screen_____________________________________________________
+
 gameEntry=tk.Entry(
     font=('arial', 30, 'bold'),
     bg='#f5f5f5',
