@@ -3,7 +3,7 @@ from sys import maxsize
 import random as ran
 
 
-def getEquation():
+def getEquation(event=None):
     global currentEquation
     global answer
     global wager
@@ -16,13 +16,16 @@ def getEquation():
     if questionTypeChoice is advancedOperatorList:
         randomOperator = ran.choices(questionTypeChoice, weights=(1, 5), k=1,)[0]
     else: randomOperator = ran.choice(questionTypeChoice)
-    if questionTypeChoice == simpleOeratorList:
-        randnum1 = ran.randint(0, 200)
-        randnum2 = ran.randint(0, 200)
-    elif questionTypeChoice == advancedOperatorList:
-        randnum1 = ran.randint(0, 100)
-        randnum2 = ran.choice((1, 2, 4, 5, 10, 20, 25, 50, 100))
-    equationDisplay = f'{randnum1} {randomOperator} {randnum2}'
+    if questionTypeChoice == simpleOperatorList:
+        randNum1 = ran.randint(0, 200)
+        randNum2 = ran.randint(0, 200)
+    elif questionTypeChoice == advancedOperatorList and randomOperator == '/':
+        randNum1 = ran.randint(0, 100)
+        randNum2 = ran.choice((1, 2, 4, 5, 10, 20, 25, 50, 100))
+    elif questionTypeChoice == advancedOperatorList and randomOperator == '*':
+        randNum1 = ran.randint(0, 100)
+        randNum2 = ran.randint(0, 100)
+    equationDisplay = f'{randNum1} {randomOperator} {randNum2}'
     answer = eval(equationDisplay)
     if answer%1 != 0:
         getEquation()
@@ -32,13 +35,22 @@ def getEquation():
         wager = 1
         if questionTypeChoice == advancedOperatorList:
             additionalWager = 1
-            if randnum1 not in (1, 0):
-                if randnum2 not in (1, 0):
-                    additionalWager += (max(randnum2, randnum1)/15)
+            if randNum1 not in (1, 0):
+                if randNum2 not in (1, 0):
+                    if randNum1 == randNum2 and randomOperator == '/':
+                        pass
+                    else:
+                        additionalWager += ((max(randNum1, randNum2) + abs(randNum1 - randNum2))/15)
+                    if randNum1%10 != 0 and randNum2%10 != 0:
+                            additionalWager += 4
+                    elif randNum1%10 == 0 and randNum2%10 == 0:
+                        additionalWager -= 1
         else:
-            if randnum1%10 != 0 or randnum2%10 !=0:
-                additionalWager += (abs(randnum1 - randnum2) / 100)
-            else: additionalWager = .2
+            if randNum1%10 != 0 or randNum2%10 !=0:
+                additionalWager += (abs(max(randNum1, randNum2) - answer + abs(randNum1 - randNum2))/85)
+            else: additionalWager = 1.5
+            if randNum1 <=10 or randNum2 <= 10: additionalWager = 1
+    if additionalWager < 0: additionalWager = 1
             
             
 def answerCheck(event):
@@ -50,42 +62,45 @@ def answerCheck(event):
     elif enteredAnswer != answer:
         currentScore -= 1.5
         labelAboveEntry.config(fg='red', text='Incorrect!')
-    screen1.after(2000, lambda :labelAboveEntry.config(text=''))
+    screen1.after(2020, lambda :labelAboveEntry.config(text=''))
+    gameEntry.delete(0, 'end')
         
-    scoreLabel.config(text=f'Score: {currentScore}')
+    scoreLabel.config(text=f'Score: {currentScore:.2f}')
     getEquation()
 
 def gameStart():
         labelAboveEntry.config(text='Ready?')
         screen1.after(1000, lambda: labelAboveEntry.config(text='Set...'))
-        screen1.after(2000, lambda: gameEntry.bind('<Return>', answerCheck))
-        screen1.after(2000, lambda: labelAboveEntry.config(text='Go!'))
-        screen1.after(2000, getEquation)
+        screen1.after(2000, lambda: getEquation(None))
+        screen1.after(2010, lambda: gameEntry.bind('<Return>', answerCheck))
+        screen1.after(2020, lambda: labelAboveEntry.config(text='Go!'))
+        screen1.after(3000, lambda: labelAboveEntry.config(text=''))
+        
         
       
 
 def playButtonClick():
     
     
-    for widget in menuWidgetList:
+    for widget in menuWidgets:
         widget.grid_forget()
     
     playScreenGrid()
-    gameEntry.grid(
-        row=57,
-        rowspan=6,
-        column=46, 
-        sticky='news', 
-        columnspan=9
-    )
+    clicked = False
+    score = 0
+    scoreLabel.config(text="Score: 0")
+    
+    gameEntry.delete(0, 'end')
     gameEntry.insert(0, "Enter Answers Here")
     
-    
+    gameEntry.grid(row=57, rowspan=6, column=46, sticky='news', columnspan=9)
     questionBox.grid(row=49, column=45, rowspan=2, columnspan=11, sticky='nsew')
     labelAboveEntry.grid(row=54, column=45, rowspan=2, columnspan=11)
     timeLabel.grid(row=49, column=57, columnspan=8,sticky='sew')
     scoreLabel.grid(row=50, column=57, columnspan=8, sticky='sew')
+    menuButton.grid(row=54, column =57, columnspan=8, sticky='new', padx=15)
     gameStart()
+    
     
     
     
@@ -95,13 +110,32 @@ def playButtonClick():
 
 
 def menuScreen():
+
     screen1.grid_rowconfigure(0, weight=200)
     screen1.grid_rowconfigure(1, weight=1)
     screen1.grid_rowconfigure(2, weight=1)
 
     screen1.grid_columnconfigure(0, weight=10)
     screen1.grid_columnconfigure(1, weight=10)
-    #screen1.grid_columnconfigure(2, weight=5)
+
+    playButton.grid(row=1, column=1, sticky='wsn', padx=20, pady=0)
+    leaderboardButton.grid(row=2, column=1, sticky='nsw', padx=20, pady=20)
+    exitButton.grid(row=3, column=1, sticky='nws', padx=20, pady=0)
+    spacer.grid(row=4, column=1, sticky='nws')
+    titleLabel.grid(row=1, rowspan=3, column=0, pady=0, sticky='nes')
+    
+def setMenuScreen():
+    for widget in gameWidgets:
+        widget.grid_forget()
+    for i in range(101):
+        screen1.grid_rowconfigure(i, weight=0)
+        screen1.grid_columnconfigure(i, weight=0)
+    screen1.grid_rowconfigure(0, weight=200)
+    screen1.grid_rowconfigure(1, weight=1)
+    screen1.grid_rowconfigure(2, weight=1)
+
+    screen1.grid_columnconfigure(0, weight=10)
+    screen1.grid_columnconfigure(1, weight=10)
 
     playButton.grid(row=1, column=1, sticky='wsn', padx=20, pady=0)
     leaderboardButton.grid(row=2, column=1, sticky='nsw', padx=20, pady=20)
@@ -139,6 +173,7 @@ answer = None
 firstQuestion=False
 wager = 1
 additionalWager=None
+
 #screen1 creation
 print(f"1: {5.4845 * 2}\n2: {19}")
 
@@ -213,7 +248,7 @@ titleLabel = tk.Label(
 
 menuScreen()
 
-menuWidgetList=[playButton, leaderboardButton, exitButton, spacer, titleLabel ]
+
 #Game running screen_____________________________________________________
 
 gameEntry=tk.Entry(
@@ -252,11 +287,35 @@ scoreLabel = tk.Label(
     bg=f'black',
     fg= 'blue'
 )
+menuButton = tk.Button(
+    command = setMenuScreen,
+    text='Menu',
+    
+    font=('arial', 50, 'bold'),
+    bg='#c40000',
+    activebackground='orange',
+    #height=6
+)
 
 
 
 
 
+menuWidgets = [
+    playButton,
+    leaderboardButton,
+    exitButton,
+    spacer,
+    titleLabel
+]
 
+gameWidgets = [
+    gameEntry,
+    questionBox,
+    labelAboveEntry,
+    timeLabel,
+    scoreLabel,
+    menuButton
+]
 
 screen1.mainloop()
