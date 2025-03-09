@@ -1,25 +1,71 @@
 import tkinter as tk
-#from tkinter import PhotoImage, Button
-import time
 from sys import maxsize
 import random as ran
 
+
 def getEquation():
     global currentEquation
-    global  enteredAnswer
-    operatorList = ['+', '-', '*', '÷' ]
-    randnum1 = ran.randint(0, 130)
-    randnum2 = ran.randint(0, 130)
-    randomOperator1 = ran.choice(operatorList)
-    equationDisplay = f'{randnum1} {randomOperator1}, {randnum2}'
+    global answer
+    global wager
+    global additionalWager
+    wager = 1
+    additionalWager = 0
+    simpleOperatorList = ('+', '-')
+    advancedOperatorList = ('*', '/')
+    questionTypeChoice = ran.choices((simpleOperatorList, advancedOperatorList), weights=(1, 5), k=1)[0]
+    if questionTypeChoice is advancedOperatorList:
+        randomOperator = ran.choices(questionTypeChoice, weights=(1, 5), k=1,)[0]
+    else: randomOperator = ran.choice(questionTypeChoice)
+    if questionTypeChoice == simpleOeratorList:
+        randnum1 = ran.randint(0, 200)
+        randnum2 = ran.randint(0, 200)
+    elif questionTypeChoice == advancedOperatorList:
+        randnum1 = ran.randint(0, 100)
+        randnum2 = ran.choice((1, 2, 4, 5, 10, 20, 25, 50, 100))
+    equationDisplay = f'{randnum1} {randomOperator} {randnum2}'
     answer = eval(equationDisplay)
+    if answer%1 != 0:
+        getEquation()
+    else:
+        equationDisplay = equationDisplay.replace('/','÷')
+        questionBox.config(text=equationDisplay)
+        wager = 1
+        if questionTypeChoice == advancedOperatorList:
+            additionalWager = 1
+            if randnum1 not in (1, 0):
+                if randnum2 not in (1, 0):
+                    additionalWager += (max(randnum2, randnum1)/15)
+        else:
+            if randnum1%10 != 0 or randnum2%10 !=0:
+                additionalWager += (abs(randnum1 - randnum2) / 100)
+            else: additionalWager = .2
+            
+            
+def answerCheck(event):
+    global currentScore
+    enteredAnswer = float(gameEntry.get())
+    if enteredAnswer == answer:
+        currentScore += (wager + additionalWager)
+        labelAboveEntry.config(fg='green', text='Correct!')
+    elif enteredAnswer != answer:
+        currentScore -= 1.5
+        labelAboveEntry.config(fg='red', text='Incorrect!')
+    screen1.after(2000, lambda :labelAboveEntry.config(text=''))
+        
+    scoreLabel.config(text=f'Score: {currentScore}')
+    getEquation()
 
-
-
-
-
+def gameStart():
+        labelAboveEntry.config(text='Ready?')
+        screen1.after(1000, lambda: labelAboveEntry.config(text='Set...'))
+        screen1.after(2000, lambda: gameEntry.bind('<Return>', answerCheck))
+        screen1.after(2000, lambda: labelAboveEntry.config(text='Go!'))
+        screen1.after(2000, getEquation)
+        
+      
 
 def playButtonClick():
+    
     
     for widget in menuWidgetList:
         widget.grid_forget()
@@ -33,12 +79,19 @@ def playButtonClick():
         columnspan=9
     )
     gameEntry.insert(0, "Enter Answers Here")
-    gameEntry.bind('<Button-1>', gameEntryFocusIn)
+    
     
     questionBox.grid(row=49, column=45, rowspan=2, columnspan=11, sticky='nsew')
     labelAboveEntry.grid(row=54, column=45, rowspan=2, columnspan=11)
     timeLabel.grid(row=49, column=57, columnspan=8,sticky='sew')
     scoreLabel.grid(row=50, column=57, columnspan=8, sticky='sew')
+    gameStart()
+    
+    
+    
+
+   
+    
 
 
 def menuScreen():
@@ -82,6 +135,10 @@ currentTime = 60
 currentEquation = None
 enteredAnswer = None
 currentScore = 0
+answer = None
+firstQuestion=False
+wager = 1
+additionalWager=None
 #screen1 creation
 print(f"1: {5.4845 * 2}\n2: {19}")
 
@@ -91,14 +148,14 @@ screen1.geometry(f"{screen1.winfo_screenwidth()}x{screen1.winfo_screenheight()}"
 screen1.title("Marly's Math Dash")
 windowIcon = tk.PhotoImage(file = 'sprites/chillFish.png')
 screen1.iconphoto(True, windowIcon)
-screen1.attributes('-fullscreen', True )
+screen1.attributes('-fullscreen', False )
 
 
 #screen buttons
 playSprite = tk.PhotoImage(file='sprites/PerfectlyCroppedPlayButton.png')
 playSprite = playSprite.subsample(4, 4)
 playButton = tk.Button(screen1)
-#playButton.pack()
+
 
 
 
@@ -150,9 +207,10 @@ titleLabel = tk.Label(
     text = 'Welcome to\n Marly\'s math dash!',
     bg = 'orange',
     fg='black',
-    font=('arial', 45, 'bold' )
+    font=('arial', 45, 'bold' ),
     
 )
+
 menuScreen()
 
 menuWidgetList=[playButton, leaderboardButton, exitButton, spacer, titleLabel ]
@@ -164,6 +222,10 @@ gameEntry=tk.Entry(
     fg='black',
     justify='center'
 )
+gameEntry.bind('<Button-1>', gameEntryFocusIn)
+
+
+
 questionBox = tk.Label(
     text='87 + 32',
     font=('arial', 85, 'bold'),
@@ -192,7 +254,7 @@ scoreLabel = tk.Label(
 )
 
 
-print('hi')
+
 
 
 
