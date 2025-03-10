@@ -1,9 +1,63 @@
 import tkinter as tk
 from sys import maxsize
 import random as ran
+from tkinter import TclError
 
+
+def menuScreen():
+    """
+    Initially sets the menu screen widgets on the screen
+    
+    :return: None
+    """
+
+    screen1.grid_rowconfigure(0, weight=200)
+    screen1.grid_rowconfigure(1, weight=1)
+    screen1.grid_rowconfigure(2, weight=1)
+
+    screen1.grid_columnconfigure(0, weight=10)
+    screen1.grid_columnconfigure(1, weight=10)
+
+    playButton.grid(row=1, column=1, sticky='wsn', padx=20, pady=0)
+    leaderboardButton.grid(row=2, column=1, sticky='nsw', padx=20, pady=20)
+    exitButton.grid(row=3, column=1, sticky='nws', padx=20, pady=0)
+    spacer.grid(row=4, column=1, sticky='nws')
+    titleLabel.grid(row=1, rowspan=3, column=0, pady=0, sticky='nes')
+    
+def setMenuScreen():
+    """
+    Clears all widgets, gridlines, and .after processes before placing
+    all menu widgets back on the screen.
+    This is intended for the menuButton
+    :return:
+    """
+    global gameIsPlaying
+    global gameStartProcesses
+    gameIsPlaying = False
+    gameEntry.unbind('<Return>')
+    for widget in gameWidgets:
+        widget.grid_forget()
+    for i in range(101):
+        screen1.grid_rowconfigure(i, weight=0)
+        screen1.grid_columnconfigure(i, weight=0)
+    menuScreen()
+    
+    try:
+        for process in gameStartProcesses:
+            screen1.after_cancel(process)
+    except ValueError:
+        print('An error would have occured')
 
 def getEquation(event=None):
+    """
+    Generates a new randomized math equation, then set's an answer
+     variable to answer of the new equation.
+    Also uses a detailed algorithm to determine how many points the question will be worth
+     depending on the difficulty of the math problem.
+    Finally, the new equation is displayed in the "questionBox" widget.
+    :param event: None
+    :return: None
+    """
     global currentEquation
     global answer
     global wager
@@ -51,10 +105,11 @@ def getEquation(event=None):
             else: additionalWager = 1.5
             if randNum1 <=10 or randNum2 <= 10: additionalWager = 1
     if additionalWager < 0: additionalWager = 1
-            
-            
+    
+
 def answerCheck(event):
     global currentScore
+    
     enteredAnswer = float(gameEntry.get())
     if enteredAnswer == answer:
         currentScore += (wager + additionalWager)
@@ -64,29 +119,45 @@ def answerCheck(event):
         labelAboveEntry.config(fg='red', text='Incorrect!')
     screen1.after(2020, lambda :labelAboveEntry.config(text=''))
     gameEntry.delete(0, 'end')
-        
+    
     scoreLabel.config(text=f'Score: {currentScore:.2f}')
     getEquation()
 
+
 def gameStart():
-        labelAboveEntry.config(text='Ready?')
-        screen1.after(1000, lambda: labelAboveEntry.config(text='Set...'))
-        screen1.after(2000, lambda: getEquation(None))
-        screen1.after(2010, lambda: gameEntry.bind('<Return>', answerCheck))
-        screen1.after(2020, lambda: labelAboveEntry.config(text='Go!'))
-        screen1.after(3000, lambda: labelAboveEntry.config(text=''))
-        
-        
-      
+    global gameIsPlaying
+    global gameStartProcesses, afterID_01, afterID_02, afterID_03, afterID_04, afterID_05, timerCountProcessID
+    gameIsPlaying = True
+    questionBox.config(text='')
+    labelAboveEntry.config(text='Ready?', fg='green')
+    afterID_01 = screen1.after(1000, lambda: labelAboveEntry.config(text='Set...'))
+    afterID_02 = screen1.after(2001, lambda: labelAboveEntry.config(text='Go!'))
+    afterID_03 = screen1.after(2002, lambda: gameEntry.bind('<Return>', answerCheck))
+    afterID_04 = screen1.after(2003, lambda: getEquation(None))
+    afterID_05  = screen1.after(3000, lambda: labelAboveEntry.config(text=''))
+    afterID_06 = screen1.after(2004, timerCount)
+    gameStartProcesses = [afterID_01, afterID_02, afterID_03, afterID_04, afterID_05, timerCountProcessID]
+
+def gameEnd():
+    global gameIsPlaying
+    gameIsPlaying = False
+    
+
+
+
+
+    
+    
 
 def playButtonClick():
     
-    
+    global clicked
+    clicked = False
     for widget in menuWidgets:
         widget.grid_forget()
     
     playScreenGrid()
-    clicked = False
+    
     score = 0
     scoreLabel.config(text="Score: 0")
     
@@ -99,49 +170,11 @@ def playButtonClick():
     timeLabel.grid(row=49, column=57, columnspan=8,sticky='sew')
     scoreLabel.grid(row=50, column=57, columnspan=8, sticky='sew')
     menuButton.grid(row=54, column =57, columnspan=8, sticky='new', padx=15)
+    screen1.focus_set()
+    gameEntry.bind('<Button-1>', gameEntryFocusIn)
     gameStart()
     
-    
-    
-    
 
-   
-    
-
-
-def menuScreen():
-
-    screen1.grid_rowconfigure(0, weight=200)
-    screen1.grid_rowconfigure(1, weight=1)
-    screen1.grid_rowconfigure(2, weight=1)
-
-    screen1.grid_columnconfigure(0, weight=10)
-    screen1.grid_columnconfigure(1, weight=10)
-
-    playButton.grid(row=1, column=1, sticky='wsn', padx=20, pady=0)
-    leaderboardButton.grid(row=2, column=1, sticky='nsw', padx=20, pady=20)
-    exitButton.grid(row=3, column=1, sticky='nws', padx=20, pady=0)
-    spacer.grid(row=4, column=1, sticky='nws')
-    titleLabel.grid(row=1, rowspan=3, column=0, pady=0, sticky='nes')
-    
-def setMenuScreen():
-    for widget in gameWidgets:
-        widget.grid_forget()
-    for i in range(101):
-        screen1.grid_rowconfigure(i, weight=0)
-        screen1.grid_columnconfigure(i, weight=0)
-    screen1.grid_rowconfigure(0, weight=200)
-    screen1.grid_rowconfigure(1, weight=1)
-    screen1.grid_rowconfigure(2, weight=1)
-
-    screen1.grid_columnconfigure(0, weight=10)
-    screen1.grid_columnconfigure(1, weight=10)
-
-    playButton.grid(row=1, column=1, sticky='wsn', padx=20, pady=0)
-    leaderboardButton.grid(row=2, column=1, sticky='nsw', padx=20, pady=20)
-    exitButton.grid(row=3, column=1, sticky='nws', padx=20, pady=0)
-    spacer.grid(row=4, column=1, sticky='nws')
-    titleLabel.grid(row=1, rowspan=3, column=0, pady=0, sticky='nes')
 
 def playScreenGrid():
     for i in range(101):
@@ -164,7 +197,25 @@ def gameEntryFocusIn(event):
         gameEntry.delete(0, 'end')
         clicked = True
 
+        
+def timeDecrement():
+    global currentTime
+    currentTime -= 1
+    
+def timerCount():
+    global currentTime
+    if gameIsPlaying and (currentTime > 0):
+        timeDecrement()
+        timeLabel.config(text=f'Time: {currentTime}')
+        if currentTime > 0:
+            timerCountProcessID = screen1.after(1000, timerCount)
+    else:
+        currentTime= 60
+        timeLabel.config(text= f"Time: {currentTime}")
+
+
 clicked = False
+gameIsPlaying = False
 currentTime = 60
 currentEquation = None
 enteredAnswer = None
@@ -173,9 +224,11 @@ answer = None
 firstQuestion=False
 wager = 1
 additionalWager=None
+[afterID_01, afterID_02, afterID_03, afterID_04, afterID_05, timerCountProcessID] = [None, None, None, None, None, None]
+gameStartProcesses = [afterID_01, afterID_02, afterID_03, afterID_04, afterID_05, timerCountProcessID]
 
 #screen1 creation
-print(f"1: {5.4845 * 2}\n2: {19}")
+
 
 screen1 = tk.Tk()
 screen1.config(background='#1f1f1f')
@@ -257,12 +310,10 @@ gameEntry=tk.Entry(
     fg='black',
     justify='center'
 )
-gameEntry.bind('<Button-1>', gameEntryFocusIn)
-
 
 
 questionBox = tk.Label(
-    text='87 + 32',
+    text='',
     font=('arial', 85, 'bold'),
     bg=f"{screen1.cget('bg')}",
     fg='#c40000',
@@ -296,7 +347,11 @@ menuButton = tk.Button(
     activebackground='orange',
     #height=6
 )
-
+endGameScreen = tk.label(
+    bg='orange',
+    fg='black',
+    
+)
 
 
 
@@ -318,4 +373,9 @@ gameWidgets = [
     menuButton
 ]
 
+
+
+
+
 screen1.mainloop()
+
