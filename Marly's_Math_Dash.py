@@ -1,5 +1,11 @@
 import tkinter as tk
 import random as ran
+#Imports the LeaderBoardScreen submodule, which reads the names and scores the user adds to 'ADD_SCORES_HERE.txt'
+# before displaying the top ten scores on a leaderboard.
+#This is intended to be used by a teacher who would get the best scores of all their students and add them to the txt
+# file
+import LeaderboardScreen
+
 
 
 
@@ -9,7 +15,7 @@ def menuScreen():
     
     :return: None
     """
-
+#configures the grid for the menu screen
     screen1.grid_rowconfigure(0, weight=200)
     screen1.grid_rowconfigure(1, weight=1)
     screen1.grid_rowconfigure(2, weight=1)
@@ -17,33 +23,57 @@ def menuScreen():
     screen1.grid_columnconfigure(0, weight=10)
     screen1.grid_columnconfigure(1, weight=10)
 
+    #Places all menu screen widgets onto the grid
     playButton.grid(row=1, column=1, sticky='wsn', padx=20, pady=0)
     leaderboardButton.grid(row=2, column=1, sticky='nsw', padx=20, pady=20)
     exitButton.grid(row=3, column=1, sticky='nws', padx=20, pady=0)
     spacer.grid(row=4, column=1, sticky='nws')
     titleLabel.grid(row=1, rowspan=3, column=0, pady=0, sticky='nes')
     
+    
+    
+    
+def widgetForget(widget):
+    """
+    Removes a widget from the grid
+    
+    :param widget: Determines which widget to remove from the grid
+    :return: None
+    """
+    widget.grid_forget()
+    #Removes a widget from the grid
+    
 def setMenuScreen():
     """
     Clears all widgets, gridlines, and .after processes before placing
     all menu widgets back on the screen.
-    This is intended for the menuButton
+    
     :return:
     """
+    #declares all global variables
     global gameIsPlaying
     global gameStartProcesses
     global currentTime
     global gameStartProcesses
-    currentTime = 0
     
+    currentTime = 0 #assures that the currentTime variable is set to zero so the timerCount() function stops
+    #Uses a function to make sure the timer recursion loop stops if the menu button is pushed
     stopTimer()
+#Cancels all .after calls inside the gameStartProcess function
     for i, process in enumerate(gameStartProcesses):
         try:
             screen1.after_cancel(process)
         except Exception:
             pass
-    gameIsPlaying = False
+
+    gameIsPlaying = False #sets the gameIsPlaying variable to False, giving the timerCount Function another flag to
+    # make sure it stops the recursion loop when it is supposed to.
+    
+    #Unbinds the 'enter' Button from the gameEntry label so the user can't start entering answers before the game
+    # starts
     gameEntry.unbind('<Return>')
+    
+    #Removes all widgets from the grid from when the game was playing.
     for widget in gameWidgets:
         widget.grid_forget()
     for i in range(101):
@@ -58,11 +88,14 @@ def setMenuScreen():
         except Exception:
             pass
     stopTimer()
+    playButton.config(text='START')
 
 def menuButtonClick():
+    global endGameWidgets
     menuButton.config(state='disabled', bg=disabledbackground)
-    
     screen1.after(500, setMenuScreen)
+    for widget in endGameWidgets:
+        screen1.after(501, lambda w=widget: widgetForget(w))
 
 
 def getEquation(event=None):
@@ -118,7 +151,7 @@ def getEquation(event=None):
                         additionalWager -= 1
         else:
             if randNum1%10 != 0 or randNum2%10 !=0:
-                additionalWager += (abs(max(randNum1, randNum2) - answer + abs(randNum1 - randNum2))/85)
+                additionalWager += (abs(max(randNum1, randNum2) - answer + abs(randNum1 - randNum2))/70)
             else: additionalWager = 1.5
             if randNum1 <=10 or randNum2 <= 10: additionalWager = 1
     if additionalWager < 0: additionalWager = 1
@@ -176,14 +209,25 @@ def playButtonClick():
     global clicked
     global currentTime
     global gameIsPlaying
+    global endGameWidgets
+    global currentScore, questionsAnswered
     stopTimer()
     screen1.after(1000, lambda: menuButton.config(state='normal', bg='#c40000'))
     clicked = False
     currentTime = 120
-    timeLabel.config(text="Time: 120")
-    for widget in menuWidgets:
-        widget.grid_forget()
+    [currentScore, questionsAnswered] = [0, 0]
     
+    timeLabel.config(text="Time: 120")
+    try:
+        for widget in menuWidgets:
+            widget.grid_forget()
+    except Exception:
+        pass
+    try:
+        for widget in endGameWidgets:
+            widget.grid_forget()
+    except Exception:
+        print('endgamewidget Undefined')
     playScreenGrid()
     
     score = 0
@@ -249,7 +293,7 @@ def timerCount():
         timeDecrement()
         timeLabel.config(text=f'Time: {currentTime}')
         if currentTime > 0 and gameIsPlaying:
-            timerCountProcessID = screen1.after(1, timerCount)
+            timerCountProcessID = screen1.after(1000, timerCount)
     else:
         currentTime= 120
         timeLabel.config(text= f"Time: {currentTime}")
@@ -263,8 +307,14 @@ def gameEnd():
     gameIsPlaying = False
     for widget in gameWidgets:
         widget.grid_forget()
-    endGameTitle.grid(row=30, column=36, columnspan=28, rowspan=12, pady=20, padx=20, sticky='ew')
-    endGameScoreLabel.grid(row=50, column=36, rowspan=5, columnspan=7, sticky='ewns'  )
+    endGameTitle.grid(row=30, column=36, columnspan=28, rowspan=12, pady=0, padx=0, sticky='sewnews')
+    endGameScoreLabel.grid(row=55, column=40, columnspan=8, sticky='w'  )
+    endGameScoreLabel.config(text=f'Score: {currentScore:.2f}')
+    correctAnswersLabel.grid(row=60, column=40, columnspan=8, sticky='w'  )
+    correctAnswersLabel.config(text=f'Correct Answers: {questionsAnswered}')
+    playButton.grid(row=80, column=45, sticky='news', padx=20, pady=0)
+    playButton.config(text= 'Again?')
+    
 
 
 clicked = False
@@ -321,7 +371,7 @@ playButton.config(
 leaderboardButton = tk.Button(screen1)
 
 leaderboardButton.config(
-    command = None,
+    command = lambda: LeaderboardScreen.open_leaderboard(),
     text='Leaderboard',
     font=('arial', 50, 'bold'),
     borderwidth=0,
@@ -350,7 +400,7 @@ spacer = tk.Label(
     height=20
 )
 titleLabel = tk.Label(
-    text = 'Welcome to\n Marly\'s math dash!',
+    text = 'Welcome to\n Marly\'s Math Dash!',
     bg = 'orange',
     fg='black',
     font=('arial', 45, 'bold' ),
@@ -420,11 +470,19 @@ endGameTitle = tk.Label(
 )
 endGameScoreLabel = tk.Label(
     text=f'Score: {currentScore}',
-    font=('arial', 60, 'bold'),
+    font=('arial', 65, 'bold'),
     bg=screen1.cget('bg'),
     fg='blue'
     
 )
+
+correctAnswersLabel= tk.Label(
+    text=f'Score: {currentScore}',
+    font=('arial', 65, 'bold'),
+    bg=screen1.cget('bg'),
+    fg='blue'
+    )
+
 
 
 
@@ -449,6 +507,7 @@ gameWidgets = [
     menuButton
 ]
 
+endGameWidgets = [endGameTitle, endGameScoreLabel, correctAnswersLabel]
 
 
 
