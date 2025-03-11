@@ -1,7 +1,6 @@
 import tkinter as tk
-from sys import maxsize
 import random as ran
-from tkinter import TclError
+
 
 
 def menuScreen():
@@ -33,6 +32,16 @@ def setMenuScreen():
     """
     global gameIsPlaying
     global gameStartProcesses
+    global currentTime
+    global gameStartProcesses
+    currentTime = 0
+    
+    stopTimer()
+    for i, process in enumerate(gameStartProcesses):
+        try:
+            screen1.after_cancel(process)
+        except Exception:
+            pass
     gameIsPlaying = False
     gameEntry.unbind('<Return>')
     for widget in gameWidgets:
@@ -42,11 +51,19 @@ def setMenuScreen():
         screen1.grid_columnconfigure(i, weight=0)
     menuScreen()
     
-    try:
-        for process in gameStartProcesses:
+
+    for i, process in enumerate(gameStartProcesses):
+        try:
             screen1.after_cancel(process)
-    except ValueError:
-        print('An error would have occured')
+        except Exception:
+            pass
+    stopTimer()
+
+def menuButtonClick():
+    menuButton.config(state='disabled', bg=disabledbackground)
+    
+    screen1.after(500, setMenuScreen)
+
 
 def getEquation(event=None):
     """
@@ -108,11 +125,12 @@ def getEquation(event=None):
     
 
 def answerCheck(event):
-    global currentScore
+    global currentScore, questionsAnswered
     
     enteredAnswer = float(gameEntry.get())
     if enteredAnswer == answer:
         currentScore += (wager + additionalWager)
+        questionsAnswered += 1
         labelAboveEntry.config(fg='green', text='Correct!')
     elif enteredAnswer != answer:
         currentScore -= 1.5
@@ -130,21 +148,25 @@ def gameStart():
     gameIsPlaying = True
     questionBox.config(text='')
     labelAboveEntry.config(text='Ready?', fg='green')
-    afterID_01 = screen1.after(1000, lambda: labelAboveEntry.config(text='Set...'))
-    afterID_02 = screen1.after(2001, lambda: labelAboveEntry.config(text='Go!'))
-    afterID_03 = screen1.after(2002, lambda: gameEntry.bind('<Return>', answerCheck))
-    afterID_04 = screen1.after(2003, lambda: getEquation(None))
-    afterID_05  = screen1.after(3000, lambda: labelAboveEntry.config(text=''))
-    afterID_06 = screen1.after(2004, timerCount)
+    afterID_01 = screen1.after(1, lambda: labelAboveEntry.config(text='Set...'))
+    afterID_02 = screen1.after(1001, lambda: labelAboveEntry.config(text='Go!'))
+    afterID_03 = screen1.after(1002, lambda: gameEntry.bind('<Return>', answerCheck))
+    afterID_04 = screen1.after(1003, lambda: getEquation(None))
+    afterID_06 = screen1.after(1004, timerCount)
+    afterID_05  = screen1.after(2000, lambda: labelAboveEntry.config(text=''))
+    
+    
     gameStartProcesses = [afterID_01, afterID_02, afterID_03, afterID_04, afterID_05, timerCountProcessID]
 
-def gameEnd():
-    global gameIsPlaying
-    gameIsPlaying = False
-    
 
-
-
+def stopTimer():
+    global timerCountProcessID
+    if timerCountProcessID is not None:
+        try:
+            screen1.after_cancel(timerCountProcessID)
+        except Exception:
+            pass
+        timerCountProcessID = None
 
     
     
@@ -152,7 +174,13 @@ def gameEnd():
 def playButtonClick():
     
     global clicked
+    global currentTime
+    global gameIsPlaying
+    stopTimer()
+    screen1.after(1000, lambda: menuButton.config(state='normal', bg='#c40000'))
     clicked = False
+    currentTime = 120
+    timeLabel.config(text="Time: 120")
     for widget in menuWidgets:
         widget.grid_forget()
     
@@ -172,7 +200,11 @@ def playButtonClick():
     menuButton.grid(row=54, column =57, columnspan=8, sticky='new', padx=15)
     screen1.focus_set()
     gameEntry.bind('<Button-1>', gameEntryFocusIn)
-    gameStart()
+    questionBox.config(text='')
+    labelAboveEntry.config(text='Ready?')
+    screen1.after(1000, gameStart)
+    gameIsPlaying = True
+    
     
 
 
@@ -199,24 +231,45 @@ def gameEntryFocusIn(event):
 
         
 def timeDecrement():
-    global currentTime
-    currentTime -= 1
+    global currentTime, timerCountProcessID
+    if gameIsPlaying:
+        currentTime -= 1
+    else: screen1.cancel(timerCountProcessID)
     
 def timerCount():
-    global currentTime
+    global currentTime, timerCountProcessID
+    global gameStartProcesses
+    try:
+        if timerCountProcessID is not None:
+            screen1.after_cancel(timerCountProcessID)
+    except Exception:
+            pass
+            
     if gameIsPlaying and (currentTime > 0):
         timeDecrement()
         timeLabel.config(text=f'Time: {currentTime}')
-        if currentTime > 0:
-            timerCountProcessID = screen1.after(1000, timerCount)
+        if currentTime > 0 and gameIsPlaying:
+            timerCountProcessID = screen1.after(1, timerCount)
     else:
-        currentTime= 60
+        currentTime= 120
         timeLabel.config(text= f"Time: {currentTime}")
+        stopTimer()
+    if currentTime == 0:
+        gameEnd()
+
+def gameEnd():
+    global gameWidgets
+    global gameIsPlaying
+    gameIsPlaying = False
+    for widget in gameWidgets:
+        widget.grid_forget()
+    endGameTitle.grid(row=30, column=36, columnspan=28, rowspan=12, pady=20, padx=20, sticky='ew')
+    endGameScoreLabel.grid(row=50, column=36, rowspan=5, columnspan=7, sticky='ewns'  )
 
 
 clicked = False
 gameIsPlaying = False
-currentTime = 60
+currentTime = 120
 currentEquation = None
 enteredAnswer = None
 currentScore = 0
@@ -224,8 +277,13 @@ answer = None
 firstQuestion=False
 wager = 1
 additionalWager=None
+questionsAnswered = 0
 [afterID_01, afterID_02, afterID_03, afterID_04, afterID_05, timerCountProcessID] = [None, None, None, None, None, None]
 gameStartProcesses = [afterID_01, afterID_02, afterID_03, afterID_04, afterID_05, timerCountProcessID]
+disabledbackground = '#9C3C3C'
+enabledBackground = '#c40000'
+
+
 
 #screen1 creation
 
@@ -339,19 +397,37 @@ scoreLabel = tk.Label(
     fg= 'blue'
 )
 menuButton = tk.Button(
-    command = setMenuScreen,
+    command = menuButtonClick,
     text='Menu',
-    
     font=('arial', 50, 'bold'),
-    bg='#c40000',
+    disabledforeground='black',
+    bg=disabledbackground,
+    state='disabled',
     activebackground='orange',
     #height=6
 )
-endGameScreen = tk.label(
+
+
+#End Game Screen Widgets___________________________________
+endGameTitle = tk.Label(
     bg='orange',
+    #screen1.cget('bg'),
     fg='black',
+    text='Time\'s up!',
+    font=('arial', 80, 'bold'),
+    #height=2,
     
 )
+endGameScoreLabel = tk.Label(
+    text=f'Score: {currentScore}',
+    font=('arial', 60, 'bold'),
+    bg=screen1.cget('bg'),
+    fg='blue'
+    
+)
+
+
+
 
 
 
