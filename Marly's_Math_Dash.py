@@ -168,7 +168,10 @@ def getEquation(event=None):
     #This string is used to display the equation to the user, along with
     # determining the answer to the equation using the Eval function
     equationDisplay = f'{randNum1} {randomOperator} {randNum2}'
-    answer = eval(equationDisplay)
+    try:
+        answer = eval(equationDisplay)
+    except Exception:
+        pass
     
     #get's a new equation using a recursive loop if the answer's remainder isn't an integer.
     if answer%1 != 0:
@@ -214,8 +217,10 @@ def answerCheck(event):
     
     global currentScore, questionsAnswered, enteredAnswer
     
-    enteredAnswer = float(gameEntry.get()) #Variable holds the string entered by the user as a floating point number
-    
+    try:
+        enteredAnswer = float(gameEntry.get()) #Variable holds the string entered by the user as a floating point number
+    except Exception:
+        print('invalid Input')
     #I decided to describe this section of text in the docstring.
     if enteredAnswer == answer:
         currentScore += (wager + additionalWager)
@@ -508,7 +513,7 @@ playButton.config(
 leaderboardButton = tk.Button(screen1)
 
 leaderboardButton.config(
-    command = lambda: LeaderboardScreen.open_leaderboard(),
+    command = lambda: LeaderboardScreen.openLeaderboard(), #calls the LeaderBoardScreen module and all it's functions
     text='Leaderboard',
     font=('arial', 50, 'bold'),
     borderwidth=0,

@@ -1,21 +1,18 @@
-You: 285
-Michael: 47
-Let: 169
-Jayluh: 90
-Gonna: 215
-Give: 287
-John: 42
-Up: 270
-Never: 373
-You: 140
-Never: 225
-Emily: 7
-Rick: 73
-Down: 116
-Gonna: 290
-
-
-
+You: 142
+Michael: 23.52978
+Let: 84.5
+Jayluh: 45
+Gonna: 107.5
+Give: 143.50000000000001
+John: 21
+Up: 135
+Never: 186.
+You: 70
+Never: 112.3
+Emily: 3.578
+Rick: 36.5
+Down: 58
+Gonna: 145.7
 
 
 

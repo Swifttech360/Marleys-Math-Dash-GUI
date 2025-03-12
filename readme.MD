@@ -6,7 +6,7 @@ Made using Python's built in tkinter package, Marly's Math Dash is an elementery
 math game designed to allow students to challenge them selves in a fun, educational way.   
 
 ## Instructions: 
-###   menu:
+###   Menu:
 Using the program is simple. To play the game, all you have to do is double click the project file  
 named "Marly's_Math_Dash" (assuming you have installed a python interpreter, which is required to  
 run the program) Once in the game, you can click 'QUIT' to close the whole program, 'Leaderboard'    
@@ -27,7 +27,7 @@ rank the scores using the leaderboard screen.
 ### Leaderboards:
 The idea of the leaderboard system was to allow teachers or friend groups to create competitions that may  
 last one or several days. One person would act as the host, adding everyones scores to their own local leaderboard  
-file. Then, through other means, this scoreboard can be displayed to the class  to show who's in the lead.   
+file. Then, through other means, this scoreboard can be displayed to the compettitors to show who's in the lead.   
 To access leader boards, simply press the leaderboard button in the menu. This should open a new window  
 above the main one. To add or remove a score, go to the project folder and open the 'ADD_SCORES_HERE.txt' file.  
 Then, on a new line, Add in the supposed users name/nickname, a colon, a space, and then that users score. Adding  
@@ -47,7 +47,17 @@ and it's ok to have multiple scores from the same person.
 To close both windows of the program, just navigate to the menu   
 screen of the main window and press the "QUIT" button.
 
+## Program Testing Data:
+There are 3 major tests I did for this program. Firstly, I'd quickly click kthrough the widgets 10 to 15 times to make  
+sure the game would always start properly. Then I'd answer around 20 questions with a calculator.  
+
+While the question answering went well very early on, I had to make the start and menu buttons disable for a second  
+after the playButton is pressed, as repetitive clicking at intervals under a second would  
+cause the timerCount function to start early and run multiple instances of itself at once. Now, these program  
+features work as expected and have passed both my tests flawlessly after they were both run 5 times each.
 
 
+## Side Note:
+#### For more info, please check the project's "DemoScreenshots" folder.
 
 
