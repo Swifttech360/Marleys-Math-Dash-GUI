@@ -54,7 +54,7 @@ def displayLeaderboard(root):
             rank_text = f"       {i + 1}.            {name}: {score:.2f}"
         else:
             rank_text = f"     {i + 1}.            {name}: {score:.2f}"
-        rankHolderLabel = tk.Label(root, text=rank_text, bg=root.cget('bg'), fg='red', font=('Arial', 60, 'bold'))
+        rankHolderLabel = tk.Label(root, text=rank_text, bg=root.cget('bg'), fg='red', font=('Arial', 40, 'bold'))
         rankHolderLabel.grid(row=i + 1, column=1, padx=20, pady=5, sticky='w')
         
         #makes the top three scores orange(which is meant to be gold, but I like this color palet),
@@ -102,8 +102,8 @@ def openLeaderboard():
     
     #Creates and configures the exit button with a collback function so it only kills the LeaderBoard screen
     # and not the whole program.
-    exitButton = tk.Button(LeaderBoard, text="Exit", command=LeaderBoard.destroy, font=('Arial', 60), bg='#1f1f1f', fg='white')
-    exitButton.grid(row=12, column=1, pady=20)
+    exitButton = tk.Button(LeaderBoard, text="Exit", command=LeaderBoard.destroy, font=('Arial', 50), bg='#1f1f1f', fg='white')
+    #exitButton.grid(row=12, column=1, pady=20)
 
     #Configures 13 rows ans 3 columns (only 3 columns because I found that it makes centering widgets much easier
     for i in range(13):
